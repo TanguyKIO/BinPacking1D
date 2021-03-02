@@ -1,3 +1,5 @@
+package main.java;
+
 public class BinPacking {
 
     static int infBorne(int[] items, Bin bin) {
@@ -11,6 +13,10 @@ public class BinPacking {
     }
 
     public static void main(String args[]) {
+        /*ProblemContext[] contexts = FileManager.getContexts();
+        for(int i=0;i<contexts.length; i++){
+            System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
+        }*/
         Bin bin = new Bin(5);
         int[] items1 = new int[]{5, 5, 5, 5, 6};
         int[] items2 = new int[]{5, 5, 5, 5, 5};
