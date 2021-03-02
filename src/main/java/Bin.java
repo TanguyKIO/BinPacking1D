@@ -1,5 +1,6 @@
 package main.java;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Bin {
@@ -10,6 +11,7 @@ public class Bin {
     public Bin(int length){
         this.length = length;
         this.spaceLeft = length;
+        items = new HashSet<Item>();
     }
 
     public void addItem(Item item) {
