@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Bin {
-    private int length;
+    private final int length;
     private int spaceLeft;
     private Set<Item> items;
 
@@ -37,6 +37,6 @@ public class Bin {
     }
 
     public boolean isBinValid(){
-        return spaceLeft >= 0 ? true : false;
+        return spaceLeft >= 0;
     }
 }
