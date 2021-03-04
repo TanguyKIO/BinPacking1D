@@ -32,10 +32,6 @@ public class Bin {
         return length;
     }
 
-    public void setLength(int length) {
-        this.length = length;
-    }
-
     public int getSpaceLeft(){
         return spaceLeft;
     }
