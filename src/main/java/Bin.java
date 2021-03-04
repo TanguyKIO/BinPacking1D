@@ -11,7 +11,11 @@ public class Bin {
     public Bin(int length){
         this.length = length;
         this.spaceLeft = length;
-        items = new HashSet<Item>();
+        items = new HashSet<>();
+    }
+
+    public boolean canAdd(Item item){
+        return  item.getSize()<=spaceLeft;
     }
 
     public void addItem(Item item) {
@@ -38,5 +42,11 @@ public class Bin {
 
     public boolean isBinValid(){
         return spaceLeft >= 0;
+    }
+
+    public String toString(){
+        String concat = "";
+        for(Item item: items){ concat += item.toString() + '-'; }
+        return concat.substring(0, concat.length() - 1);
     }
 }

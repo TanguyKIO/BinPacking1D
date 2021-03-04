@@ -1,12 +1,12 @@
 package main.java;
 import java.io.*;
 
+
 public class FileManager{
 
     public static ProblemContext[] getContexts(){
         String repertory = "data/";
         File file = new File(repertory);
-        System.out.println(file.getAbsolutePath());
         File[] files = file.listFiles();
         ProblemContext[] contexts = new ProblemContext[files.length];
         for(int i=0; i<files.length; i++){
@@ -29,7 +29,7 @@ public class FileManager{
                 int itemValue = Integer.parseInt(itemRead);
                 items[i] = new Item(itemValue);
             }
-            return new ProblemContext(binLenght, items);
+            return new ProblemContext(binLenght, items, file.getName().replaceFirst("[.][^.]+$", ""));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -43,11 +43,11 @@ public class FileManager{
     public static PrintWriter getWriter(String fileName) {
         PrintWriter writer = null;
         try {
-        writer = new PrintWriter("/results/"+fileName + ".csv", "UTF-8");
+            writer = new PrintWriter("results/"+fileName + ".csv", "UTF-8");
         } catch (FileNotFoundException e) {
-        e.printStackTrace();
+            e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
+            e.printStackTrace();
         }
         return writer;
     }

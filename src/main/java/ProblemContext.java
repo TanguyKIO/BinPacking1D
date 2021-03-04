@@ -3,17 +3,19 @@ package main.java;
 public class ProblemContext {
     private int binLength;
     private Item[] items;
+    private String name;
 
-    public ProblemContext(int length, Item[] items){
+    public ProblemContext(int length, Item[] items, String name){
         this.binLength = length;
         this.items = items;
+        this.name = name;
     }
 
     public int getBinLength() { return binLength; }
 
-    public void setBinLength(int binLength) { this.binLength = binLength; }
-
     public Item[] getItems() { return items; }
 
-    public void setItems(Item[] items) { this.items = items; }
+    public String getName() {
+        return name;
+    }
 }

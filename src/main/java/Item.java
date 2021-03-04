@@ -1,6 +1,6 @@
 package main.java;
 
-public class Item {
+public class Item implements Comparable<Item>{
     private int size;
 
     public Item(int size) {
@@ -13,5 +13,14 @@ public class Item {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public String toString(){
+        return String.valueOf(this.size);
+    }
+
+    @Override
+    public int compareTo(Item o) {
+        return Integer.compare(this.size, o.getSize());
     }
 }
