@@ -1,5 +1,3 @@
-package main.java;
-
 public class ProblemContext {
     private int binLength;
     private Item[] items;
