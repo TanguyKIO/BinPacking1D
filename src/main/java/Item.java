@@ -1,5 +1,3 @@
-package main.java;
-
 public class Item implements Comparable<Item>{
     private int size;
 

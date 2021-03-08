@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="or-tools_VisualStudio2019-64bit_v8.2">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../../Google-OR/or-tools_VisualStudio2019-64bit_v8.2.8710" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../../Google-OR/or-tools_VisualStudio2019-64bit_v8.2.8710" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../Google-OR/or-tools_VisualStudio2019-64bit_v8.2.8710" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../Google-OR/or-tools_VisualStudio2019-64bit_v8.2.8710" recursive="false" type="SOURCES" />
+  </library>
+</component>
