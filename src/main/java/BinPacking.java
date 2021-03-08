@@ -1,3 +1,6 @@
+import lpsolve.LpSolve;
+import lpsolve.LpSolveException;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +40,32 @@ public class BinPacking {
             }
         }
         return bins;
+    }
+
+    public static void optimalLPSolve(ProblemContext context){
+        Item[] items = context.getItems();
+        int numberItem = items.length;
+        int numberVar = (int) Math.pow(numberItem, 2);
+        int binLength = context.getBinLength();
+        try {
+            LpSolve lp = LpSolve.makeLp(0, numberVar);
+
+            double row[] = new double[numberItem];
+            int col[] = new int[numberItem];
+
+            lp.setAddRowmode(true);
+            for(int i=0; i<numberItem; i++) {
+                for (int j = 0; i < numberItem; i++) {
+                    col[i] = i*numberItem + j; //Variable x_01, x_02 ...
+                    row[i] = items[i].getSize();
+                    lp.addConstraintex(numberItem, row, col, LpSolve.LE, binLength);
+                }
+            }
+
+        } catch (LpSolveException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void main(String args[]) {
