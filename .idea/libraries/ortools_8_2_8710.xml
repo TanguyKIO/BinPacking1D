@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="ortools-8.2.8710">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Desktop/Cours/S8/Opti Discrete/ortools-8.2.8710.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ortools-8.2.8710.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
