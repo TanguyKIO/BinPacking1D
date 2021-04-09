@@ -17,6 +17,7 @@ public class FileManager{
     public static ProblemContext readFile(File file){
         BufferedReader lecteur;
         try {
+            System.out.println(file.getAbsolutePath());
             lecteur = new BufferedReader(new InputStreamReader( new FileInputStream(file.getAbsolutePath()), "UTF8"));
             String firstLine = lecteur.readLine();
             String[] values = firstLine.split("\\s+");

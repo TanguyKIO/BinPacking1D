@@ -112,21 +112,22 @@ public class BinPacking {
         // [START print_solution]
         // Check that the problem has an optimal solution.
         if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
-            System.out.println("Number of bins used: " + objective.value());
+            System.out.println("Nombre de bins utilisées: " + objective.value());
             double totalWeight = 0;
             for (int j = 0; j < numBins; ++j) {
                 if (y[j].solutionValue() == 1) {
-                    System.out.println("\nBin " + j + "\n");
+                    //System.out.println("\nBin " + j + "\n");
                     double binWeight = 0;
                     for (int i = 0; i < numItems; ++i) {
                         if (x[i][j].solutionValue() == 1) {
-                            System.out.println("Item " + i + " - weight: " + items[i].getSize());
+                            //System.out.println("Item " + i + " - weight: " + items[i].getSize());
                             binWeight += items[i].getSize();
                         }
                     }
-                    System.out.println("Packed bin weight: " + binWeight);
+                    //System.out.println("Packed bin weight: " + binWeight);
                     totalWeight += binWeight;
                 }
+
             }
             System.out.println("\nTotal packed weight: " + totalWeight);
         } else {
@@ -141,7 +142,6 @@ public class BinPacking {
             System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
             linearBinPacking(contexts[i]);
         }
-
 
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");
         PrintWriter writerQ2 = FileManager.getWriter("question2");
