@@ -17,6 +17,7 @@ public class Bin {
     }
 
     public void addItem(Item item) {
+        item.setBin(this);
         items.add(item);
         spaceLeft -= item.getSize();
     }

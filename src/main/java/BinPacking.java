@@ -4,9 +4,7 @@ import com.google.ortools.linearsolver.MPObjective;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 
 public class BinPacking {
 
@@ -136,11 +134,42 @@ public class BinPacking {
 
     }
 
+    static void simpleBinPacking(ProblemContext context){
+        Item[] items = context.getItems();
+        int numItems = items.length;
+        int binLength = context.getBinLength();
+        int totalWeight = 0;
+        ArrayList<Bin> pack = new ArrayList<Bin>();
+        for(int i = 0; i<numItems;i++){
+            totalWeight+=items[i].getSize();
+            Bin bin = new Bin(binLength);
+            bin.addItem(items[i]);
+            pack.add(bin);
+        }
+        System.out.println("\nNombre de bins utilisées: " + numItems);
+        System.out.println("\nTotal packed weight: " + totalWeight);
+
+    }
+
+    static void switchItem(Item item1, Item item2){
+        Bin bin1  = item1.getBin();
+        Bin bin2  = item2.getBin();
+        bin1.removeItem(item1);
+        bin2.removeItem(item2);
+        if(bin1.canAdd(item2) && bin2.canAdd(item1)){
+            bin1.addItem(item2);
+            bin2.addItem(item1);
+        } else {
+            bin1.addItem(item1);
+            bin2.addItem(item2);
+        }
+    }
+
     public static void main(String args[]) {
         ProblemContext[] contexts = FileManager.getContexts();
         for(int i=0;i<contexts.length; i++){
             System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
-            linearBinPacking(contexts[i]);
+            simpleBinPacking(contexts[i]);
         }
 
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");

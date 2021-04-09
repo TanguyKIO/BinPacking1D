@@ -1,5 +1,6 @@
-public class Item implements Comparable<Item>{
+public class Item implements Comparable<Item> {
     private int size;
+    private Bin bin;
 
     public Item(int size) {
         this.size = size;
@@ -13,7 +14,15 @@ public class Item implements Comparable<Item>{
         this.size = size;
     }
 
-    public String toString(){
+    public Bin getBin() {
+        return bin;
+    }
+
+    public void setBin(Bin bin) {
+        this.bin = bin;
+    }
+
+    public String toString() {
         return String.valueOf(this.size);
     }
 
