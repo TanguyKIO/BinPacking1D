@@ -16,13 +16,18 @@ public class Bin {
         return  item.getSize()<=spaceLeft;
     }
 
-    public void addItem(Item item) {
+    public void addItem(Item item){
+        if(item.getBin() != null){
+            item.removeBin();
+        }
+        item.setBin(this);
         item.setBin(this);
         items.add(item);
         spaceLeft -= item.getSize();
     }
 
     public void removeItem(Item item){
+        item.unBind();
         items.remove(item);
         spaceLeft += item.getSize();
     }

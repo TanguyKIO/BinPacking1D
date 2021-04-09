@@ -14,17 +14,17 @@ public class Item implements Comparable<Item> {
         this.size = size;
     }
 
-    public Bin getBin() {
-        return bin;
-    }
-
-    public void setBin(Bin bin) {
-        this.bin = bin;
-    }
-
     public String toString() {
         return String.valueOf(this.size);
     }
+
+    public Bin getBin() { return bin; }
+
+    public void setBin(Bin bin) { this.bin = bin; }
+
+    public void removeBin(){ bin.removeItem(this); }
+
+    public void unBind() { this.bin = null; }
 
     @Override
     public int compareTo(Item o) {

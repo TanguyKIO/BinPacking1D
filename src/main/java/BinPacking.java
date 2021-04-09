@@ -23,6 +23,11 @@ public class BinPacking {
         Item[] items = context.getItems();
         int binLength = context.getBinLength();
         Arrays.sort(items, Collections.reverseOrder());
+        return firstFit(items, binLength);
+    }
+
+
+    public static ArrayList<Bin> firstFit(Item[] items, int binLength){
         ArrayList<Bin> bins = new ArrayList<>();
         for(Item item: items){
             boolean added = false;
@@ -131,17 +136,16 @@ public class BinPacking {
         } else {
             System.err.println("The problem does not have an optimal solution.");
         }
-
     }
 
-    static void simpleBinPacking(ProblemContext context){
+    static void simpleBinPacking(ProblemContext context) {
         Item[] items = context.getItems();
         int numItems = items.length;
         int binLength = context.getBinLength();
         int totalWeight = 0;
         ArrayList<Bin> pack = new ArrayList<Bin>();
-        for(int i = 0; i<numItems;i++){
-            totalWeight+=items[i].getSize();
+        for (int i = 0; i < numItems; i++) {
+            totalWeight += items[i].getSize();
             Bin bin = new Bin(binLength);
             bin.addItem(items[i]);
             pack.add(bin);
@@ -149,6 +153,14 @@ public class BinPacking {
         System.out.println("\nNombre de bins utilisées: " + numItems);
         System.out.println("\nTotal packed weight: " + totalWeight);
 
+    }
+
+    // Question 4 b
+    public static ArrayList<Bin> firstFitRandom(ProblemContext context){
+        Item[] items = context.getItems();
+        int binLength = context.getBinLength();
+        Collections.shuffle(Arrays.asList(items));
+        return firstFit(items, binLength);
     }
 
     static void switchItem(Item item1, Item item2){
@@ -164,6 +176,15 @@ public class BinPacking {
             bin2.addItem(item2);
         }
     }
+
+
+    //Question 5 a
+    public static ArrayList<Bin> moveItem(Item item, Bin bin, ArrayList<Bin> bins){
+        item.removeBin();
+        bin.addItem(item);
+        return bins;
+    }
+
 
     public static void main(String args[]) {
         ProblemContext[] contexts = FileManager.getContexts();
