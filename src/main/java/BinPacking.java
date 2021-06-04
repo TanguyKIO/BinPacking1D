@@ -4,6 +4,7 @@ import com.google.ortools.linearsolver.MPObjective;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
 
+import java.io.PrintWriter;
 import java.util.*;
 
 public class BinPacking {
@@ -163,7 +164,17 @@ public class BinPacking {
         return firstFit(items, binLength);
     }
 
-    static void switchItem(Item item1, Item item2){
+    //Question 5 a
+    public static boolean moveItem(Item item, Bin bin){
+        if(bin.canAdd(item)){
+            item.removeBin();
+            bin.addItem(item);
+            return true;
+        } else return false;
+    }
+
+    //Question 5 b
+    static boolean switchItem(Item item1, Item item2){
         Bin bin1  = item1.getBin();
         Bin bin2  = item2.getBin();
         bin1.removeItem(item1);
@@ -171,26 +182,75 @@ public class BinPacking {
         if(bin1.canAdd(item2) && bin2.canAdd(item1)){
             bin1.addItem(item2);
             bin2.addItem(item1);
+            return true;
         } else {
             bin1.addItem(item1);
             bin2.addItem(item2);
+            return false;
         }
     }
 
+    static List<Bin> getBestVoisin(ArrayList<Bin> originalBins){
+        int bestFitness = 0;
+        ArrayList<Bin> bestSol = originalBins;
+        for(int k=0; k<originalBins.size(); k++){
+            for(int j=0; j<originalBins.get(k).getItems().size(); j++){
+                double r = Math.random();
+                for(int i = 0; i<originalBins.size(); i++){
+                    if(i==k) continue;
+                    if(r<1){ // Add
+                        ArrayList<Bin> binsCopy = (ArrayList<Bin>) originalBins.clone();
+                        Bin previousBin = binsCopy.get(k);
+                        Bin newBin = binsCopy.get(i);
+                        Item item = previousBin.getItem(j);
+                        if(newBin.canAdd(item)){
+                            previousBin.removeItem(item);
+                            newBin.addItem(item);
+                            int fitness = getFitness(binsCopy);
+                            if(fitness > bestFitness){
+                                bestFitness = fitness;
+                                bestSol = binsCopy;
+                            };
+                        }
+                    }else{ // Swit
+                        for(int m=0; m<originalBins.get(i).getItems().size(); m++){
+                            ArrayList<Bin> binsCopy = (ArrayList<Bin>) originalBins.clone();
+                            Bin binSwitch = binsCopy.get(i);
+                            Bin previousBin = binsCopy.get(k);
+                            Item item = previousBin.getItem(i);
+                            Item switchItem = binSwitch.getItem(m);
+                            switchItem(item, switchItem);
+                            if(binSwitch.isBinValid() && previousBin.isBinValid()){
+                                int fitness = getFitness(binsCopy);
+                                if(fitness > bestFitness){
+                                    bestFitness = fitness;
+                                    bestSol = binsCopy;
+                                }
+                            }
+                        }
+                    }
+                }
 
-    //Question 5 a
-    public static ArrayList<Bin> moveItem(Item item, Bin bin, ArrayList<Bin> bins){
-        item.removeBin();
-        bin.addItem(item);
-        return bins;
+            }
+        }
+        return bestSol;
+    }
+
+    static void tabouSearch(List<Bin> array, int momory){
+
+
+       //ArrayList<List<Bin>> sol
     }
 
 
     public static void main(String args[]) {
         ProblemContext[] contexts = FileManager.getContexts();
+        ArrayList<Bin> solution = new ArrayList<>();
         for(int i=0;i<contexts.length; i++){
-            System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
-            simpleBinPacking(contexts[i]);
+            //System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
+            //simpleBinPacking(contexts[i]);
+            solution = simulatedAnnealing(firstFitDecreasing(contexts[i]), 1000, 200, 100, 0.59);
+            System.out.println("Nb de bins utilisés : "+ solution.size());
         }
 
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");
@@ -209,4 +269,72 @@ public class BinPacking {
     }
 
 
+    static int getFitness(List<Bin> bins){
+        int f = 0;
+        for (Bin b: bins) {
+            f += b.getFitness();
+        }
+        return f;
+    }
+
+    public static ArrayList<Bin> simulatedAnnealing(ArrayList<Bin> x0, double t0, int n1, int n2, double mu){
+        ArrayList<Bin> xmin = x0;
+        int fmin = getFitness(x0);
+        int i = 0;
+        ArrayList<ArrayList<Bin>> xi = new ArrayList<>();
+        ArrayList<Double> tk = new ArrayList<>();
+        tk.add(t0);
+        xi.add(x0);
+        List<Item> items;
+        List<Item> items2;
+        int random;
+        int random2;
+        int deltaf;
+        boolean found = false;
+        double p;
+        for(int k=0; k<n1; k++){
+            for(int l=0; l<n2; l++){
+                ArrayList<Bin> y = (ArrayList<Bin>) xi.get(i).clone();
+                while(!found){
+                    found = false;
+                    random = 0;
+                    random2 = 0;
+                    if(Math.random() > 0.50){
+                        while(random==random2){
+                            random = (int) (Math.random() * (y.size()));
+                            random2 = (int) (Math.random() * (y.size()));
+                        }
+                        items = y.get(random).getItems();
+                        items2 = y.get(random2).getItems();
+                        random = (int) (Math.random() * (items.size()));
+                        random2 = (int) (Math.random() * (items2.size()));
+                        Item item1 = items.get(random);
+                        Item item2 = items2.get(random2);
+                        if(switchItem(item1, item2)) found = true;
+                    } else {
+                        random = (int) (Math.random() * (y.size()));
+                        Bin bin = y.get(random);
+                        random = (int) (Math.random() * (bin.getItems().size()));
+                        Item item = bin.getItems().get(random);
+                        if(moveItem(item, bin)) found = true;
+                    }
+                }
+                deltaf = getFitness(y) - getFitness(xi.get(i));
+                if(deltaf<=0){
+                    xi.add(y);
+                    if(fmin>getFitness(y)) {
+                        xmin = y;
+                        fmin = getFitness(y);
+                    }
+                } else {
+                    p = 0.7;
+                    if(p <= Math.exp(-deltaf/tk.get(k))) xi.add(y);
+                    else xi.add(xi.get(i));
+                }
+                i++;
+            }
+            tk.add(mu*tk.get(k));
+        }
+        return xmin;
+    }
 }

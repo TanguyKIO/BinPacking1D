@@ -22,7 +22,7 @@ public class Item implements Comparable<Item> {
 
     public void setBin(Bin bin) { this.bin = bin; }
 
-    public void removeBin(){ bin.removeItem(this); }
+    public void removeBin(){ bin.removeItem(this);}
 
     public void unBind() { this.bin = null; }
 
