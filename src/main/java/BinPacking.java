@@ -163,7 +163,17 @@ public class BinPacking {
     }
 
     //Question 5 a
-    public static boolean moveItem(Item item, Bin bin, ArrayList<Bin> bins){
+    public static boolean moveItem(Item item, Bin bin){
+        if(bin.canAdd(item)){
+            item.removeBin();
+            bin.addItem(item);
+            return true;
+        }
+        return false;
+    }
+
+
+    public static boolean moveItem2(Item item, Bin bin, ArrayList<Bin> bins){
         if(bin.canAdd(item)){
             Bin pastBin = item.getBin();
             item.removeBin();
@@ -192,41 +202,41 @@ public class BinPacking {
         }
     }
 
-    static List<Bin> getBestVoisin(ArrayList<Bin> originalBins){
+    static NeightberhoodFunction getBestVoisin(List<Bin> originalBins, List<NeightberhoodFunction> tabouList){
         int bestFitness = 0;
-        ArrayList<Bin> bestSol = originalBins;
-        for(int k=0; k<originalBins.size(); k++){
-            for(int j=0; j<originalBins.get(k).getItems().size(); j++){
-                double r = Math.random();
-                for(int i = 0; i<originalBins.size(); i++){
-                    if(i==k) continue;
+        List<Bin> bestSol = originalBins;
+        NeightberhoodFunction bestNeightberhoodFunction = null;
+        for(int indexFirstBin=0; indexFirstBin<originalBins.size(); indexFirstBin++){
+            for(int indexFirstItem=0; indexFirstItem<originalBins.get(indexFirstBin).getItems().size(); indexFirstItem++){
+                double r = Math.random()*2;
+                for(int indexSecondBin = 0; indexSecondBin<originalBins.size(); indexSecondBin++){
+                    if(indexSecondBin==indexFirstBin) continue;
+                    Bin previousBin = originalBins.get(indexFirstBin);
+                    Bin newBin = originalBins.get(indexSecondBin);
+                    Item item = previousBin.getItem(indexFirstItem);
                     if(r<1){ // Add
-                        ArrayList<Bin> binsCopy = (ArrayList<Bin>) originalBins.clone();
-                        Bin previousBin = binsCopy.get(k);
-                        Bin newBin = binsCopy.get(i);
-                        Item item = previousBin.getItem(j);
-                        if(newBin.canAdd(item)){
-                            previousBin.removeItem(item);
-                            newBin.addItem(item);
-                            int fitness = getFitness(binsCopy);
+                        NeightberhoodFunction neightberhoodFunction = new Move(item, newBin, previousBin);
+                        if(!tabouList.contains(neightberhoodFunction) && moveItem(item, newBin)){
+                            int fitness = getFitness(originalBins);
+                            moveItem(item, previousBin);
                             if(fitness > bestFitness){
                                 bestFitness = fitness;
-                                bestSol = binsCopy;
+                                bestNeightberhoodFunction = neightberhoodFunction;
                             };
                         }
-                    }else{ // Swit
-                        for(int m=0; m<originalBins.get(i).getItems().size(); m++){
-                            ArrayList<Bin> binsCopy = (ArrayList<Bin>) originalBins.clone();
-                            Bin binSwitch = binsCopy.get(i);
-                            Bin previousBin = binsCopy.get(k);
-                            Item item = previousBin.getItem(i);
-                            Item switchItem = binSwitch.getItem(m);
-                            switchItem(item, switchItem);
-                            if(binSwitch.isBinValid() && previousBin.isBinValid()){
-                                int fitness = getFitness(binsCopy);
+                    }else{ // Switch
+                        for(int indexSecondItem=0; indexSecondItem<originalBins.get(indexSecondBin).getItems().size(); indexSecondItem++){
+                            Item switchItem = newBin.getItem(indexSecondItem);
+                            NeightberhoodFunction neightberhoodFunction = new Switch(item, switchItem, previousBin, newBin);
+/*
+                            System.out.println("TabouList: "+tabouList +" F :"+ neightberhoodFunction);
+*/
+                            if(item.getSize() != switchItem.getSize() && !tabouList.contains(neightberhoodFunction) && switchItem(item, switchItem) ){
+                                int fitness = getFitness(originalBins);
+                                switchItem(switchItem, item);
                                 if(fitness > bestFitness){
                                     bestFitness = fitness;
-                                    bestSol = binsCopy;
+                                    bestNeightberhoodFunction =  neightberhoodFunction;
                                 }
                             }
                         }
@@ -235,13 +245,44 @@ public class BinPacking {
 
             }
         }
-        return bestSol;
+        return bestNeightberhoodFunction;
     }
 
-    static void tabouSearch(List<Bin> array, int momory){
-
-
-       //ArrayList<List<Bin>> sol
+    static ArrayList<Bin> tabouSearch(List<Bin> solution, int memorySize, int attempt){
+        List<NeightberhoodFunction> tabouList = new ArrayList<>();
+        Map<List<Bin>, List<NeightberhoodFunction>> previousStates = new HashMap<>();
+        int previousFitness = getFitness(solution);
+        for(int i =0; i<attempt; i++){
+            NeightberhoodFunction bestNeightberhoodFunction = getBestVoisin(solution, tabouList);
+            /*List<Bin> solutionCopy = new ArrayList<>();
+            System.out.println("solutionCopy not working ?");
+            solution.get(0).deepCopy();
+            System.out.println("work on 1");
+            for(int j=0; j<solution.size(); j++){
+                solutionCopy.add(solution.get(j).deepCopy());
+            }
+            previousStates.put(solutionCopy, tabouList);
+            System.out.println("solutionCopy work");*/
+            bestNeightberhoodFunction.apply();
+            int newFitness = getFitness(solution);
+            if(newFitness<=previousFitness) {
+                tabouList.add(bestNeightberhoodFunction.reverse());
+                if(tabouList.size()>memorySize) tabouList.remove(0);
+                if(tabouList.size()==0)
+                    System.out.println("chat");
+            }
+            previousFitness = newFitness;
+            /*System.out.println("fitness work");*/
+            System.out.println("attempt number :"+ i+" fitness :" + newFitness);
+            System.out.println("TabouList: "+tabouList +" Fbest :"+ bestNeightberhoodFunction);
+/*            for (Map.Entry<List<Bin>, List<NeightberhoodFunction>> entry : previousStates.entrySet()) {
+                List<Bin> previousSolution = entry.getKey();
+                List<NeightberhoodFunction> previousTabou = entry.getValue();
+                if(previousSolution.equals(solution) && tabouList.equals(previousTabou)) break;
+            }
+            System.out.println("test works");*/
+        }
+        return (ArrayList)solution;
     }
 
 
@@ -251,10 +292,8 @@ public class BinPacking {
         for(int i=0;i<contexts.length; i++){
             //System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
             //simpleBinPacking(contexts[i]);
-            System.out.println("Borne inf : "+ infBorne(contexts[i].getItems(), contexts[i].getBinLength()));
-            solution = simulatedAnnealing(simpleBinPacking(contexts[i]), 1000, 20, 10, 0.9);
+            solution = simulatedAnnealing(firstFitDecreasing(contexts[i]), 1000, 200, 100, 0.59);
             System.out.println("Nb de bins utilisés : "+ solution.size());
-
         }
 
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");

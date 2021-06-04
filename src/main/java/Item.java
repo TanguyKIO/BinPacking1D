@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Item implements Comparable<Item> {
     private int size;
     private Bin bin;
@@ -20,14 +22,26 @@ public class Item implements Comparable<Item> {
 
     public Bin getBin() { return bin; }
 
-    public void setBin(Bin bin) { this.bin = bin; }
+    public void setBin(Bin bin) {
+        this.bin = bin;
+   }
 
-    public void removeBin(){
-        bin.removeItem(this);
-        this.bin = null;
+    public void removeBin(){ bin.removeItem(this);}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item)) return false;
+        Item item = (Item) o;
+        return size == item.size;
     }
 
-    private void unBind() { this.bin = null; }
+    @Override
+    public int hashCode() {
+        return Objects.hash(size, bin);
+    }
+
+    public void unBind() { this.bin = null; }
 
     @Override
     public int compareTo(Item o) {

@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Bin {
     private final int length;
@@ -22,11 +19,13 @@ public class Bin {
         item.setBin(this);
         items.add(item);
         spaceLeft -= item.getSize();
+        Collections.sort(items); // Permet au equal de ne pas tenir compte de l'ordre
     }
 
     public void removeItem(Item item){
         items.remove(item);
         spaceLeft += item.getSize();
+        item.setBin(null);
     }
 
     public int getLength() {
@@ -46,6 +45,7 @@ public class Bin {
     }
 
     public String toString(){
+        if(items.size() == 0) return "empty";
         String concat = "";
         for(Item item: items){ concat += item.toString() + '-'; }
         return concat.substring(0, concat.length() - 1);
@@ -58,10 +58,39 @@ public class Bin {
     }
 
     public Item getItem(int index){
-        return items.get(index);
+        try {
+            return items.get(index);
+        }catch (IndexOutOfBoundsException i ){
+            return items.get(0);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Bin)) return false;
+        Bin bin = (Bin) o;
+        return length == bin.length && spaceLeft == bin.spaceLeft && items.equals(bin.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(length, spaceLeft, items);
     }
 
     public List<Item> getItems(){
         return items;
+    }
+
+    /**
+     *
+     * @return DeepCopy of bin
+     */
+    protected Bin deepCopy() {
+        Bin clone = new Bin(length);
+        for (Item i: items) {
+            clone.addItem(new Item(i.getSize()));
+        }
+        return clone;
     }
 }
