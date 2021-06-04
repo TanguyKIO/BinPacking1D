@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Switch implements NeightberhoodFunction {
@@ -27,7 +29,7 @@ public class Switch implements NeightberhoodFunction {
     }
 
     @Override
-    public void apply(){
+    public void apply(List<Bin> bins){
         Bin bin1 = item.getBin();
         Bin bin2 = itemSwitch.getBin();
         bin1.removeItem(item);

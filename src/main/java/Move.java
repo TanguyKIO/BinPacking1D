@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,9 +32,10 @@ public class Move implements NeightberhoodFunction{
     }
 
     @Override
-    public void apply(){
+    public void apply(List<Bin> bins){
         item.removeBin();
         newBin.addItem(item);
+        if(previousBin.isBinEmpty()) bins.remove(previousBin);
     }
 
     @Override
