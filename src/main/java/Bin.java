@@ -19,17 +19,12 @@ public class Bin {
     }
 
     public void addItem(Item item){
-        if(item.getBin() != null){
-            item.removeBin();
-        }
-        item.setBin(this);
         item.setBin(this);
         items.add(item);
         spaceLeft -= item.getSize();
     }
 
     public void removeItem(Item item){
-        item.unBind();
         items.remove(item);
         spaceLeft += item.getSize();
     }
@@ -46,6 +41,10 @@ public class Bin {
         return spaceLeft >= 0;
     }
 
+    public boolean isBinEmpty(){
+        return items.isEmpty();
+    }
+
     public String toString(){
         String concat = "";
         for(Item item: items){ concat += item.toString() + '-'; }
@@ -55,7 +54,7 @@ public class Bin {
     public int getFitness() {
         int f = 0;
         for(Item i : items) f += i.getSize();
-        return f;
+        return f*f;
     }
 
     public Item getItem(int index){

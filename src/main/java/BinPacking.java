@@ -139,7 +139,7 @@ public class BinPacking {
         }
     }
 
-    static void simpleBinPacking(ProblemContext context) {
+    static ArrayList<Bin> simpleBinPacking(ProblemContext context) {
         Item[] items = context.getItems();
         int numItems = items.length;
         int binLength = context.getBinLength();
@@ -151,9 +151,7 @@ public class BinPacking {
             bin.addItem(items[i]);
             pack.add(bin);
         }
-        System.out.println("\nNombre de bins utilisées: " + numItems);
-        System.out.println("\nTotal packed weight: " + totalWeight);
-
+        return pack;
     }
 
     // Question 4 b
@@ -165,10 +163,14 @@ public class BinPacking {
     }
 
     //Question 5 a
-    public static boolean moveItem(Item item, Bin bin){
+    public static boolean moveItem(Item item, Bin bin, ArrayList<Bin> bins){
         if(bin.canAdd(item)){
+            Bin pastBin = item.getBin();
             item.removeBin();
             bin.addItem(item);
+            if(pastBin.isBinEmpty()) {
+                bins.remove(pastBin);
+            }
             return true;
         } else return false;
     }
@@ -249,8 +251,10 @@ public class BinPacking {
         for(int i=0;i<contexts.length; i++){
             //System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
             //simpleBinPacking(contexts[i]);
-            solution = simulatedAnnealing(firstFitDecreasing(contexts[i]), 1000, 200, 100, 0.59);
+            System.out.println("Borne inf : "+ infBorne(contexts[i].getItems(), contexts[i].getBinLength()));
+            solution = simulatedAnnealing(simpleBinPacking(contexts[i]), 1000, 20, 10, 0.9);
             System.out.println("Nb de bins utilisés : "+ solution.size());
+
         }
 
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");
@@ -278,8 +282,8 @@ public class BinPacking {
     }
 
     public static ArrayList<Bin> simulatedAnnealing(ArrayList<Bin> x0, double t0, int n1, int n2, double mu){
-        ArrayList<Bin> xmin = x0;
-        int fmin = getFitness(x0);
+        ArrayList<Bin> xmax = x0;
+        int fmax = getFitness(x0);
         int i = 0;
         ArrayList<ArrayList<Bin>> xi = new ArrayList<>();
         ArrayList<Double> tk = new ArrayList<>();
@@ -290,11 +294,12 @@ public class BinPacking {
         int random;
         int random2;
         int deltaf;
-        boolean found = false;
+        boolean found;
         double p;
         for(int k=0; k<n1; k++){
             for(int l=0; l<n2; l++){
                 ArrayList<Bin> y = (ArrayList<Bin>) xi.get(i).clone();
+                found = false;
                 while(!found){
                     found = false;
                     random = 0;
@@ -310,24 +315,31 @@ public class BinPacking {
                         random2 = (int) (Math.random() * (items2.size()));
                         Item item1 = items.get(random);
                         Item item2 = items2.get(random2);
-                        if(switchItem(item1, item2)) found = true;
+                        if(switchItem(item1, item2)) {
+                            found = true;
+                        }
                     } else {
                         random = (int) (Math.random() * (y.size()));
                         Bin bin = y.get(random);
-                        random = (int) (Math.random() * (bin.getItems().size()));
-                        Item item = bin.getItems().get(random);
-                        if(moveItem(item, bin)) found = true;
+                        do {
+                            random2 = (int) (Math.random() * (y.size()));
+                        } while(random==random2);
+                        random = (int) (Math.random() * (y.get(random2).getItems().size()));
+                        Item item = y.get(random2).getItems().get(random);
+                        if(moveItem(item, bin, y)) {
+                            found = true;
+                        }
                     }
                 }
                 deltaf = getFitness(y) - getFitness(xi.get(i));
                 if(deltaf<=0){
                     xi.add(y);
-                    if(fmin>getFitness(y)) {
-                        xmin = y;
-                        fmin = getFitness(y);
+                    if(fmax<getFitness(y)) {
+                        xmax = y;
+                        fmax = getFitness(y);
                     }
                 } else {
-                    p = 0.7;
+                    p = Math.random();
                     if(p <= Math.exp(-deltaf/tk.get(k))) xi.add(y);
                     else xi.add(xi.get(i));
                 }
@@ -335,6 +347,6 @@ public class BinPacking {
             }
             tk.add(mu*tk.get(k));
         }
-        return xmin;
+        return xmax;
     }
 }

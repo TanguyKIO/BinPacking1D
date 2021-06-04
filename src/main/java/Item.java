@@ -22,9 +22,12 @@ public class Item implements Comparable<Item> {
 
     public void setBin(Bin bin) { this.bin = bin; }
 
-    public void removeBin(){ bin.removeItem(this);}
+    public void removeBin(){
+        bin.removeItem(this);
+        this.bin = null;
+    }
 
-    public void unBind() { this.bin = null; }
+    private void unBind() { this.bin = null; }
 
     @Override
     public int compareTo(Item o) {
