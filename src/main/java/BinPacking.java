@@ -4,7 +4,6 @@ import com.google.ortools.linearsolver.MPObjective;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
 
-import java.io.PrintWriter;
 import java.util.*;
 
 public class BinPacking {
@@ -202,10 +201,10 @@ public class BinPacking {
         }
     }
 
-    static NeightberhoodFunction getBestVoisin(List<Bin> originalBins, List<NeightberhoodFunction> tabouList){
+    static NeighbourhoodFunction getBestNeighberhoodFunction(List<Bin> originalBins, List<NeighbourhoodFunction> tabouList){
         int bestFitness = 0;
         List<Bin> bestSol = originalBins;
-        NeightberhoodFunction bestNeightberhoodFunction = null;
+        NeighbourhoodFunction bestNeighbourhoodFunction = null;
         for(int indexFirstBin=0; indexFirstBin<originalBins.size(); indexFirstBin++){
             for(int indexFirstItem=0; indexFirstItem<originalBins.get(indexFirstBin).getItems().size(); indexFirstItem++){
                 double r = Math.random()*2;
@@ -215,25 +214,25 @@ public class BinPacking {
                     Bin newBin = originalBins.get(indexSecondBin);
                     Item item = previousBin.getItem(indexFirstItem);
                     if(r<1){ // Add
-                        NeightberhoodFunction neightberhoodFunction = new Move(item, newBin, previousBin);
-                        if(!tabouList.contains(neightberhoodFunction) && moveItem(item, newBin)){
+                        NeighbourhoodFunction neighbourhoodFunction = new Move(item, newBin, previousBin);
+                        if(!tabouList.contains(neighbourhoodFunction) && moveItem(item, newBin)){
                             int fitness = getFitness(originalBins);
                             moveItem(item, previousBin);
                             if(fitness > bestFitness){
                                 bestFitness = fitness;
-                                bestNeightberhoodFunction = neightberhoodFunction;
+                                bestNeighbourhoodFunction = neighbourhoodFunction;
                             };
                         }
                     }else{ // Switch
                         for(int indexSecondItem=0; indexSecondItem<originalBins.get(indexSecondBin).getItems().size(); indexSecondItem++){
                             Item switchItem = newBin.getItem(indexSecondItem);
-                            NeightberhoodFunction neightberhoodFunction = new Switch(item, switchItem, previousBin, newBin);
-                            if(item.getSize() != switchItem.getSize() && !tabouList.contains(neightberhoodFunction) && switchItem(item, switchItem) ){
+                            NeighbourhoodFunction neighbourhoodFunction = new Switch(item, switchItem, previousBin, newBin);
+                            if(item.getSize() != switchItem.getSize() && !tabouList.contains(neighbourhoodFunction) && switchItem(item, switchItem) ){
                                 int fitness = getFitness(originalBins);
                                 switchItem(switchItem, item);
                                 if(fitness > bestFitness){
                                     bestFitness = fitness;
-                                    bestNeightberhoodFunction =  neightberhoodFunction;
+                                    bestNeighbourhoodFunction = neighbourhoodFunction;
                                 }
                             }
                         }
@@ -242,19 +241,19 @@ public class BinPacking {
 
             }
         }
-        return bestNeightberhoodFunction;
+        return bestNeighbourhoodFunction;
     }
 
     static ArrayList<Bin> tabouSearch(List<Bin> solution, int memorySize, int attempt){
-        List<NeightberhoodFunction> tabouList = new ArrayList<>();
-        Map<List<Bin>, List<NeightberhoodFunction>> previousStates = new HashMap<>();
+        List<NeighbourhoodFunction> tabouList = new ArrayList<>();
+        Map<List<Bin>, List<NeighbourhoodFunction>> previousStates = new HashMap<>();
         int previousFitness = getFitness(solution);
         for(int i =0; i<attempt; i++){
-            NeightberhoodFunction bestNeightberhoodFunction = getBestVoisin(solution, tabouList);
-            bestNeightberhoodFunction.apply(solution);
+            NeighbourhoodFunction bestNeighbourhoodFunction = getBestNeighberhoodFunction(solution, tabouList);
+            bestNeighbourhoodFunction.apply(solution);
             int newFitness = getFitness(solution);
             if(newFitness<=previousFitness) {
-                tabouList.add(bestNeightberhoodFunction.reverse());
+                tabouList.add(bestNeighbourhoodFunction.reverse());
                 if(tabouList.size()>memorySize) tabouList.remove(0);
             }
             previousFitness = newFitness;

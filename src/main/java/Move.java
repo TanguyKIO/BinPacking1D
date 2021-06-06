@@ -1,8 +1,7 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Move implements NeightberhoodFunction{
+public class Move implements NeighbourhoodFunction {
     private Item item;
     private Bin newBin;
     private Bin previousBin;

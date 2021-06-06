@@ -1,8 +1,7 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Switch implements NeightberhoodFunction {
+public class Switch implements NeighbourhoodFunction {
     private Item item;
     private Item itemSwitch;
     private Bin bin;
