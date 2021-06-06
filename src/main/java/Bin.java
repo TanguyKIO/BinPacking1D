@@ -19,11 +19,14 @@ public class Bin {
         item.setBin(this);
         items.add(item);
         spaceLeft -= item.getSize();
-        Collections.sort(items); // Permet au equal de ne pas tenir compte de l'ordre
     }
 
     public void removeItem(Item item){
-        items.remove(item);
+        for(int i = 0; i<items.size(); i++){
+            if(items.get(i) == item){
+                items.remove(i);
+            }
+        }
         spaceLeft += item.getSize();
         item.setBin(null);
     }
@@ -58,11 +61,7 @@ public class Bin {
     }
 
     public Item getItem(int index){
-        try {
-            return items.get(index);
-        }catch (IndexOutOfBoundsException i ){
-            return items.get(0);
-        }
+        return items.get(index);
     }
 
     @Override

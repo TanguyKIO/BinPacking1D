@@ -4,6 +4,7 @@ import com.google.ortools.linearsolver.MPObjective;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
 
+import java.io.*;
 import java.util.*;
 
 public class BinPacking {
@@ -203,16 +204,15 @@ public class BinPacking {
 
     static NeighbourhoodFunction getBestNeighberhoodFunction(List<Bin> originalBins, List<NeighbourhoodFunction> tabouList){
         int bestFitness = 0;
-        List<Bin> bestSol = originalBins;
         NeighbourhoodFunction bestNeighbourhoodFunction = null;
         for(int indexFirstBin=0; indexFirstBin<originalBins.size(); indexFirstBin++){
-            for(int indexFirstItem=0; indexFirstItem<originalBins.get(indexFirstBin).getItems().size(); indexFirstItem++){
+            Bin previousBin = originalBins.get(indexFirstBin);
+            for(int indexFirstItem=0; indexFirstItem<previousBin.getItems().size(); indexFirstItem++){
                 double r = Math.random()*2;
+                Item item = previousBin.getItem(indexFirstItem);
                 for(int indexSecondBin = 0; indexSecondBin<originalBins.size(); indexSecondBin++){
                     if(indexSecondBin==indexFirstBin) continue;
-                    Bin previousBin = originalBins.get(indexFirstBin);
                     Bin newBin = originalBins.get(indexSecondBin);
-                    Item item = previousBin.getItem(indexFirstItem);
                     if(r<1){ // Add
                         NeighbourhoodFunction neighbourhoodFunction = new Move(item, newBin, previousBin);
                         if(!tabouList.contains(neighbourhoodFunction) && moveItem(item, newBin)){
@@ -224,7 +224,7 @@ public class BinPacking {
                             };
                         }
                     }else{ // Switch
-                        for(int indexSecondItem=0; indexSecondItem<originalBins.get(indexSecondBin).getItems().size(); indexSecondItem++){
+                        for(int indexSecondItem=0; indexSecondItem<newBin.getItems().size(); indexSecondItem++){
                             Item switchItem = newBin.getItem(indexSecondItem);
                             NeighbourhoodFunction neighbourhoodFunction = new Switch(item, switchItem, previousBin, newBin);
                             if(item.getSize() != switchItem.getSize() && !tabouList.contains(neighbourhoodFunction) && switchItem(item, switchItem) ){
@@ -245,18 +245,21 @@ public class BinPacking {
     }
 
     static ArrayList<Bin> tabouSearch(List<Bin> solution, int memorySize, int attempt){
+        List<Integer> iterationNumber = Arrays.asList(50,100,200,500);
         List<NeighbourhoodFunction> tabouList = new ArrayList<>();
-        Map<List<Bin>, List<NeighbourhoodFunction>> previousStates = new HashMap<>();
         int previousFitness = getFitness(solution);
         for(int i =0; i<attempt; i++){
             NeighbourhoodFunction bestNeighbourhoodFunction = getBestNeighberhoodFunction(solution, tabouList);
-            bestNeighbourhoodFunction.apply(solution);
-            int newFitness = getFitness(solution);
-            if(newFitness<=previousFitness) {
-                tabouList.add(bestNeighbourhoodFunction.reverse());
-                if(tabouList.size()>memorySize) tabouList.remove(0);
+            if(bestNeighbourhoodFunction != null) {
+                bestNeighbourhoodFunction.apply(solution);
+                int newFitness = getFitness(solution);
+                if (newFitness <= previousFitness) {
+                    tabouList.add(bestNeighbourhoodFunction.reverse());
+                    if (tabouList.size() > memorySize) tabouList.remove(0);
+                }
+                previousFitness = newFitness;
             }
-            previousFitness = newFitness;
+            if (iterationNumber.contains(i + 1)) System.out.print(solution.size() + ";");
         }
         return (ArrayList)solution;
     }
@@ -264,14 +267,100 @@ public class BinPacking {
 
     public static void main(String args[]) {
         ProblemContext[] contexts = FileManager.getContexts();
-        ArrayList<Bin> solution = new ArrayList<>();
-        for(int i=0;i<contexts.length; i++){
-            //System.out.println(contexts[i].getBinLength()+" "+contexts[i].getItems().length);
-            //simpleBinPacking(contexts[i]);
-            /*solution = simulatedAnnealing(firstFitDecreasing(contexts[i]), 1000, 200, 100, 0.59);
-            System.out.println("Nb de bins utilisés : "+ solution.size());*/
-            solution =  tabouSearch(simpleBinPacking(contexts[i]), 2, 100);
-            System.out.println("Nb de bins utilisés : "+ solution.size());
+
+        // Question 1
+/*        System.out.println("Question 1 :");
+        for (ProblemContext context: contexts) {
+            System.out.println(context.getName()+": "+infBorne(context.getItems(), context.getBinLength())+';');
+        }*/
+
+        //Question 2
+/*        System.out.println("Question 2 :");
+        for (ProblemContext context: contexts) {
+            ArrayList<Bin> bins = firstFitDecreasing(context.getItems(), context.getBinLength());
+            System.out.println(context.getName());
+            System.out.println("Nombre de bins : "+ bins.size());
+            System.out.println("Fitness : "+ getFitness(bins));
+        }*/
+
+        //Question 3
+/*
+        System.out.println("Question 3 :");
+*/
+        //Partie A
+/*        System.out.print("A. ");
+        long startTime = System.nanoTime();
+        linearBinPacking(contexts[0].getItems(), contexts[0].getBinLength());
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println("duration :"+ duration/1000000+"ms");*/
+        //Partie B
+
+
+        //Question 4
+/*        System.out.println("Question 4 :");
+        System.out.print("A. ");
+        for (ProblemContext context: contexts) {
+            ArrayList<Bin> bins = simpleBinPacking(context.getItems(), context.getBinLength());
+            System.out.println(context.getName());
+            System.out.println("Nombre de bins : "+ bins.size());
+            System.out.println("Fitness : "+ getFitness(bins));
+        }
+        System.out.print("B. ");
+        for (ProblemContext context: contexts) {
+            ArrayList<Bin> bins = firstFitRandom(context.getItems(), context.getBinLength());
+            System.out.println(context.getName());
+            System.out.println("Nombre de bins : "+ bins.size());
+            System.out.println("Fitness : "+ getFitness(bins));
+        }*/
+
+        //Question 5
+        // Méthode moveItem et switchItem
+
+
+        //Question 6
+/*        for (ProblemContext context: contexts) {
+            Item[] items= context.getItems();
+            int binLength =context.getBinLength();
+            ArrayList<Bin> bins = simulatedAnnealing(firstFitDecreasing(items, binLength), 1000, 200, 100, 0.59);
+            System.out.println(context.getName());
+            System.out.println("Nombre de bins : "+ bins.size());
+            System.out.println("Fitness : "+ getFitness(bins));
+        }*/
+
+        //Question 7
+/*        for (ProblemContext context: contexts) {
+            Item[] items= context.getItems();
+            int binLength =context.getBinLength();
+            ArrayList<Bin> bins =  tabouSearch(simpleBinPacking(items, binLength), 4, 100);
+            System.out.println(context.getName());
+            System.out.println("Nombre de bins : "+ bins.size());
+            System.out.println("Fitness : "+ getFitness(bins));
+        }*/
+
+
+
+        int [] paramsTabouSize = {5, 10, 50, 100};
+        for (ProblemContext context: contexts) {
+            try {
+                PrintStream printStream = new PrintStream("results/Question7_"+context.getName() + ".csv");
+                System.setOut(printStream); // Ecrit dans le fichier avec System.out
+                System.out.println("Paramètres;;50;100;200;500");
+                Item[] items= context.getItems();
+                int binLength =context.getBinLength();
+                for(int paramTabouSize : paramsTabouSize){
+                    System.out.print(paramTabouSize+";simpleBinPacking;");
+                    tabouSearch(simpleBinPacking(items, binLength), paramTabouSize, 500);
+                    System.out.println();
+                    System.out.print(";firstFitDecreasing;");
+                    tabouSearch(firstFitDecreasing(items, binLength), paramTabouSize, 500);
+                    System.out.println();
+                }
+                printStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
         }
 
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");
