@@ -245,7 +245,7 @@ public class BinPacking {
     }
 
     static ArrayList<Bin> tabouSearch(List<Bin> solution, int memorySize, int attempt){
-        List<Integer> iterationNumber = Arrays.asList(50,100,200,500);
+        List<Integer> iterationNumber = Arrays.asList(50,100,200,500, 750, 1000);
         List<NeighbourhoodFunction> tabouList = new ArrayList<>();
         int previousFitness = getFitness(solution);
         for(int i =0; i<attempt; i++){
@@ -337,23 +337,20 @@ public class BinPacking {
             System.out.println("Nombre de bins : "+ bins.size());
             System.out.println("Fitness : "+ getFitness(bins));
         }*/
-
-
-
-        int [] paramsTabouSize = {5, 10, 50, 100};
+       /* int [] paramsTabouSize = {5, 10, 50, 100};
         for (ProblemContext context: contexts) {
             try {
                 PrintStream printStream = new PrintStream("results/Question7_"+context.getName() + ".csv");
                 System.setOut(printStream); // Ecrit dans le fichier avec System.out
-                System.out.println("Paramètres;;50;100;200;500");
+                System.out.println("Paramètres;;50;100;200;500;750;1000");
                 Item[] items= context.getItems();
-                int binLength =context.getBinLength();
+                int binLength = context.getBinLength();
                 for(int paramTabouSize : paramsTabouSize){
                     System.out.print(paramTabouSize+";simpleBinPacking;");
-                    tabouSearch(simpleBinPacking(items, binLength), paramTabouSize, 500);
+                    tabouSearch(simpleBinPacking(items, binLength), paramTabouSize, 1000);
                     System.out.println();
                     System.out.print(";firstFitDecreasing;");
-                    tabouSearch(firstFitDecreasing(items, binLength), paramTabouSize, 500);
+                    tabouSearch(firstFitDecreasing(items, binLength), paramTabouSize, 1000);
                     System.out.println();
                 }
                 printStream.close();
@@ -361,8 +358,14 @@ public class BinPacking {
                 e.printStackTrace();
             }
 
-        }
+        }*/
 
+        for (ProblemContext context: contexts) {
+            Item[] items = context.getItems();
+            int binLength = context.getBinLength();
+            TabouThread t = new TabouThread(items, binLength, context.getName());
+            t.start();
+        }
         /*PrintWriter writerQ1 = FileManager.getWriter("question1");
         PrintWriter writerQ2 = FileManager.getWriter("question2");
         for (ProblemContext context: contexts) {
